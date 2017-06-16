@@ -1,3 +1,5 @@
+const proxy = require('express-http-proxy')
+
 const fs = require('fs');
 const express = require('express');
 const session = require('express-session');
@@ -13,13 +15,20 @@ const config = require('./webpack.config.js');
 const shopifyAuth = require('./routes/shopifyAuth');
 
 const shopifyConfig = {
-  host: 'https://kevin-shopifyapps.fwd.wf',
+  host: 'https://kevin-shopifyapps.fwd.wf',(
   apiKey: 'e83fbb0a19687cc6701eeb3ccdccb38c',
   secret: '01a9b5f3e112808a868308c2bbf33dfe',
   scope: ['write_orders, write_products'],
   afterAuth: (req, res) => {
     // do stuff like register webhooks
-    return res.redirect('/app')
+    app.use('/api', `${req.session.shop}.myshopify.com/admin/`, {
+      proxyReqOptDecorator: function(proxyReqOpts, srcReq) {
+        proxyReqOpts.headers['X-Shopify-Access-Token'] = srcReq.session.accessToken;
+        return proxyReqOpts;
+      }
+    })
+
+    return res.redirect('/app');
   }
 }
 

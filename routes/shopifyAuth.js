@@ -47,7 +47,7 @@ module.exports = function shopifyAuth({host, apiKey, secret, scope, afterAuth}) 
       },
       function(err,resp,body) {
         body = JSON.parse(body);
-        req.session.access_token = body.access_token;
+        req.session.accessToken = body.access_token;
         afterAuth(req, res)
       })
     }
